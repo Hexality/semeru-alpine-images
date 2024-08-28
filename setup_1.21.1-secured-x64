@@ -1,1 +1,39 @@
 #!/bin/sh
+
+docker build -f Dockerfile-jre21-oj9-x64-quilt_1.21.1 -t 'alpaquita-openj9:21' .
+
+mkdir -p $HOME/.mcserver
+
+echo 'eula=true' > $HOME/.mcserver/eula.txt
+
+curl -LfsS https://quiltmc.org/api/v1/download-latest-installer/java-universal -o $HOME/.mcserver/quilt-installer.jar
+
+docker run \
+    -v $HOME/.mcserver:/app/ \
+    -it alpaquita-openj9:21 \
+    /bin/sh -c 'java -jar /app/quilt-installer.jar install server 1.21.1 --download-server && rm quilt-installer.jar'
+
+echo '#!/bin/sh
+  cd /app
+  if [[ -z $JXMS ]]; then JXMS="256M"; fi
+  if [[ -z $JXMX ]]; then JXMX="4096M"; fi
+
+  [[ $PLAYIT_SECRET ]] \
+  && tmux \
+  new-session  "playit -sw --secret \'${PLAYIT_SECRET}\'" \; \
+  split-window "java -Xms${JXMS} -Xmx${JXMX} -jar ./quilt-server-launch.jar nogui; pkill playit; pkill tmux" \; \
+  || echo "Playit.gg secret is required in order to start the server."' | tee $HOME/.mcserver/start-server
+
+  chmod a+x $HOME/.mcserver/start-server
+
+docker run \
+    -v $HOME/.mcserver:/app/ \
+    -it alpaquita-openj9:21 \
+    /bin/sh /app/start-server
+
+echo 'docker run \
+    -v \$HOME/.mcserver:/app/ \
+    -it alpaquita-openj9:21 \
+    /bin/sh /app/start-server' 
+
+echo "To start the server again,  do 'PLAYIT_SECRET="" ./run.sh'"
