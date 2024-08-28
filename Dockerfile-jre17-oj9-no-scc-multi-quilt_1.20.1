@@ -28,6 +28,7 @@ RUN export SYS_ARCH=$(apk --print-arch); \
 ENV JAVA_VERSION jdk-17.0.9+9_openj9-0.41.0
 
 RUN set -eux; \
+    SYS_ARCH=$(apk --print-arch); \
     apk add --no-cache --virtual .fetch-deps; \
     case $SYS_ARCH in \
        amd64|x86_64) \
