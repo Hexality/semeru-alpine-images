@@ -1,10 +1,9 @@
 FROM bellsoft/alpaquita-linux-base:stream-glibc
 
-ENV SYS_ARCH $(apk --print-arch)
-
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
-RUN apk add --no-cache tzdata --virtual .build-deps \
+RUN export SYS_ARCH=$(apk --print-arch)
+    && apk add --no-cache tzdata --virtual .build-deps \
     && apk add curl binutils zstd tmux \
     && PLAYIT_SHA256="1a0da96f9f2ba2d5fa875c009ed01c2bd037e23777ba06fecfc5ea74cc23388f" \
     && PLAYIT_URL="https://github.com/playit-cloud/playit-agent/releases/download/v0.15.22/playit-linux-amd64" \

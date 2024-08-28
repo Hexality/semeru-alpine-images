@@ -1,10 +1,9 @@
 FROM bellsoft/alpaquita-linux-base:stream-glibc
 
-ENV SYS_ARCH $(apk --print-arch)
-
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
-RUN apk add --no-cache tzdata --virtual .build-deps \
+RUN export SYS_ARCH=$(apk --print-arch)
+    && apk add --no-cache tzdata --virtual .build-deps \
     && apk add curl binutils zstd tmux \
     && case $SYS_ARCH in \
         amd64|x86_64) \
